@@ -1,4 +1,4 @@
-# Project 1: `calc1.py`
+# Project 1: Calculator v1
 
 ## Objective
 
@@ -21,15 +21,31 @@ The input needs to follow certain rules:
 - The only arithmetic operation supported at the moment is addition
 - No whitespace characters are allowed anywhere in the input
 
-## Lexical Analysis
+## The Interpretation Process
 
-When the interpreter takes an input string, the very first step is breaking the string into **tokens**. For example, the input string is "3+5", then the tokens are:
+From source code to machine code, the interpretation process is divided into the following steps:
 
-- An integer `3`
-- An operator `+`
-- An integer `5`
+1. **Scanning**
+  - The first step is **scanning**, also known as **lexing**, or **lexical analysis**.
+  - A **scanner** (or **lexer**) takes in the linear stream of characters and chunks them together into a series of something more akin to "words". In programming languages, each of these words is called a **token**.
+  - For example, an input string "3+5" has the following tokens:
+     - An integer `3`
+     - An operator `+`
+     - An integer `5`
+2. **Parsing**
+  - The next step is **parsing**, or **syntax analysis**. This is where our syntax gets a **grammar**—the ability to compose larger expressions and statements out of smaller parts.
+  - A **parser** takes the flat sequence of tokens and builds an **abstract syntax tree (AST)** that mirrors the nested nature of the grammar.
+  - In `calc1.py`, the function `expr()` will handle both parsing and interpreting.
+3. Static Analysis
+4. Intermediate Representations
+5. Optimization
+6. Code Generation
+7. Virtual Machine
+8. Runtime
 
-This process is called **"lexical analysis"/"scanning"/"tokenizing"**, all mean the same thing. Therfore the module that handles this task is called **"lexer"/"scanner"/"tokenizer"**, same story. 
+We only implement scanning and parsing in the first few projects. Pictorially:
+
+![Mountain](Mountain.png)
 
 ## Design
 
@@ -49,7 +65,7 @@ We define two classes:
   - Defines **token type** and **token value**.
   - Token type can be 'INTEGER', 'PLUS', or 'EOF'.
   - Token value can be 0, 1, 2. 3, 4, 5, 6, 7, 8, 9, '+', or `None`.
-- The Interpreter class
+- The `Interpreter` class
   - Defines a **"pointer"** `pos` (this is actually an index) and a few useful methods for interpreting the input string.
   - `get_next_token()`: recognizes the current token and move the pointer to the right.
   - `eat()`: Verify the current toke type and move to the next token.
