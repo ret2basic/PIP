@@ -1,4 +1,4 @@
-# Project 2: `calc2.py`
+# Project 2: Calculator v2
 
 ## Objective
 
@@ -13,10 +13,6 @@ In this project, we are going to improve the `cacl1.py` interpreter. In particul
 A **lexeme** is a sequence of characters that form a token. For example:
 
 ![Lexme.png](Lexme.png)
-
-## Parsing
-
-The process of finding the structure in the stream of tokens, or put differently, the process of recognizing a phrase in the stream of tokens is called **parsing**. The part of an interpreter or compiler that performs that job is called a **parser**.
 
 ## Design
 

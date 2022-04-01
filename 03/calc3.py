@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUX', 'EOF'
+INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUS', 'EOF'
 
 class Token():
     def __init__(self, type, value):
@@ -8,8 +8,6 @@ class Token():
         self.type = type
         # Token values: 0, 1, 2. 3, 4, 5, 6, 7, 8, 9, '+', or None
         self.value = value
-        # The current character
-        self.current_char = None
 
     def __str__(self):
         """String representation of the class instance.
@@ -29,61 +27,60 @@ class Interpreter(object):
         self.pos = 0
         # The current token. e.g. '3' or '+' or '5'
         self.current_token = None
+        # The current character pointed by the "pointer"
+        self.current_char = self.text[self.pos]
 
     def error(self):
         raise Exception('Error parsing input.')
+
+    def advance(self):
+        """Advance the `pos` pointer and set the `current_char` variable."""
+
+        self.pos += 1
+        if self.pos > len(self.text) - 1:
+            # Indicates end of input
+            self.current_char = None
+        else:
+            self.current_char = self.text[self.pos]
 
     def skip_whitespace(self):
         """If the current character is whitespace, advance."""
 
         while self.current_char is not None and self.current_char.isspace():
-            self.pos += 1
-            self.current_char = self.text[self.pos]
+            self.advance()
 
+    def integer(self):
+        """Return a (multidigit) integer consumed from the input."""
+
+        result = ""
+        while self.current_char is not None and self.current_char.isdigit():
+            result += self.current_char
+            self.advance()
+        return int(result)
+    
     def get_next_token(self):
         """This is the tokenizer."""
 
-        # If the "pointer" is pointing to EOF
-        if self.pos > len(text) - 1:
-            return Token(EOF, None)
+        while self.current_char != None:
+            if self.current_char.isspace():
+                self.skip_whitespace()
+                continue
+            elif self.current_char.isdigit():
+                return Token(INTEGER, self.integer())
+            elif self.current_char == '+':
+                self.advance()
+                return Token(PLUS, '+')
+            elif self.current_char == '-':
+                self.advance()
+                return Token(MINUS, '-')
+            else:
+                self.error()
 
-        self.current_char = self.text[self.pos]
-        
-        if self.current_char.isspace():
-            self.skip_whitespace()
-
-        num = ""
-        if self.current_char.isdigit():
-            # This while loop collects all digits from a token
-            while self.pos < len(text) and self.current_char.isdigit():
-                num += self.current_char
-
-                if self.pos == len(text) - 1:
-                    break
-
-                self.pos += 1
-                self.current_char = text[self.pos]
-
-                if self.current_char == '+' or self.current_char == '-':
-                    break
-
-            token = Token(INTEGER, int(num))
-            return token
-
-        elif self.current_char == '+':
-            token = Token(PLUS, self.current_char)
-            self.pos += 1
-            return token
-        elif self.current_char == '-':
-            token = Token(MINUS, self.current_char)
-            self.pos += 1
-            return token
-        else:
-            self.error()
+        # If the current character is None, return the EOF token.
+        return Token(EOF, None)
 
     def eat(self, token_type):
         """Verify the current toke type and move to the next token."""
-        
         if self.current_token.type == token_type:
             self.current_token = self.get_next_token()
         else:
@@ -117,7 +114,7 @@ class Interpreter(object):
             result = left.value - right.value
         else:
             self.error()
-        
+
         return result
 
 if __name__ == "__main__":

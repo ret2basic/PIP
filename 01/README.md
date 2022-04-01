@@ -70,3 +70,9 @@ We define two classes:
   - `get_next_token()`: recognizes the current token and move the pointer to the right.
   - `eat()`: Verify the current toke type and move to the next token.
   - `expr()`: Parsing and interpreting.
+
+## Exercises
+
+- [x] Modify the code to allow multiple-digit integers in the input, for example "12+3"
+- [x] Add a method that skips whitespace characters so that your calculator can handle inputs with whitespace characters like "12 + 3"
+- [x] Modify the code and instead of '+' handle '-' to evaluate subtractions like "7-5"
