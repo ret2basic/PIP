@@ -53,4 +53,4 @@ We define two classes:
   - Defines a **"pointer"** `pos` (this is actually an index) and a few useful methods for interpreting the input string.
   - `get_next_token()`: recognizes the current token and move the pointer to the right.
   - `eat()`: Verify the current toke type and move to the next token.
-  - `expr()`: Verify the input format, compute and print the result.
+  - `expr()`: Parsing and interpreting.

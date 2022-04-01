@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-INTEGER, PLUS, EOF = 'INTEGER', 'PLUS', 'EOF'
+INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUS', 'EOF'
 
 class Token():
     def __init__(self, type, value):
@@ -27,31 +27,57 @@ class Interpreter(object):
         self.pos = 0
         # The current token. e.g. '3' or '+' or '5'
         self.current_token = None
+        # The current character pointed by the "pointer"
+        self.current_char = self.text[self.pos]
 
     def error(self):
         raise Exception('Error parsing input.')
 
+    def advance(self):
+        """Advance the `pos` pointer and set the `current_char` variable."""
+
+        self.pos += 1
+        if self.pos > len(self.text) - 1:
+            # Indicates end of input
+            self.current_char = None
+        else:
+            self.current_char = self.text[self.pos]
+
+    def skip_whitespace(self):
+        """If the current character is whitespace, advance."""
+
+        while self.current_char is not None and self.current_char.isspace():
+            self.advance()
+
+    def integer(self):
+        """Return a (multidigit) integer consumed from the input."""
+
+        result = ""
+        while self.current_char is not None and self.current_char.isdigit():
+            result += self.current_char
+            self.advance()
+        return int(result)
+    
     def get_next_token(self):
         """This is the tokenizer."""
 
-        text = self.text
+        while self.current_char != None:
+            if self.current_char.isspace():
+                self.skip_whitespace()
+                continue
+            elif self.current_char.isdigit():
+                return Token(INTEGER, self.integer())
+            elif self.current_char == '+':
+                self.advance()
+                return Token(PLUS, '+')
+            elif self.current_char == '-':
+                self.advance()
+                return Token(MINUS, '-')
+            else:
+                self.error()
 
-        # If the "pointer" is pointing to EOF
-        if self.pos > len(text) - 1:
-            return Token(EOF, None)
-
-        current_char = text[self.pos]
-
-        if current_char.isdigit():
-            token = Token(INTEGER, int(current_char))
-            self.pos += 1
-            return token
-        elif current_char == '+':
-            token = Token(PLUS, current_char)
-            self.pos += 1
-            return token
-        else:
-            self.error()
+        # If the current character is None, return the EOF token.
+        return Token(EOF, None)
 
     def eat(self, token_type):
         """Verify the current toke type and move to the next token."""
@@ -68,16 +94,27 @@ class Interpreter(object):
         # An integer, for example, 3
         left = self.current_token
         self.eat(INTEGER)
-        # A plus sign, +
+        # An operator, '+' or '-'
         op = self.current_token
-        self.eat(PLUS)
+        if op.type == PLUS:
+            self.eat(PLUS)
+        elif op.type == MINUS:
+            self.eat(MINUS)
+        else:
+            self.error()
         # An integer, for example, 5
         right = self.current_token
         self.eat(INTEGER)
         # After the above call, self.current_token is set to the EOF token
 
         # Once we verify that the input format is correct, compute and print the result
-        result = left.value + right.value
+        if op.type == PLUS:
+            result = left.value + right.value
+        elif op.type == MINUS:
+            result = left.value - right.value
+        else:
+            self.error()
+
         return result
 
 if __name__ == "__main__":
