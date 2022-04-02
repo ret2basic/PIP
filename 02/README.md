@@ -21,3 +21,9 @@ The major code changes compared with `calc1.py` are:
 - The `get_next_token` method was refactored a bit. The logic to increment the pos pointer was factored into a separate method advance.
 - Two more methods were added: `skip_whitespace` to ignore whitespace characters and `integer` to handle multi-digit integers in the input.
 - The `expr` method was modified to recognize `INTEGER -> MINUS -> INTEGER` phrase in addition to `INTEGER -> PLUS -> INTEGER` phrase. The method now also interprets both addition and subtraction after having successfully recognized the corresponding phrase.
+
+## Exercises
+
+- [x] Extend the calculator to handle multiplication of two integers.
+- [x] Extend the calculator to handle division of two integers.
+- [x] Modify the code to interpret expressions containing an arbitrary number of additions and subtractions, for example "9 - 5 + 3 + 11".

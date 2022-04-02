@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUS', 'EOF'
+INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, EOF = 'INTEGER', 'PLUS', 'MINUS', 'MULTIPLY', 'DIVIDE', 'EOF'
 
 class Token():
     def __init__(self, type, value):
@@ -73,6 +73,12 @@ class Interpreter(object):
             elif self.current_char == '-':
                 self.advance()
                 return Token(MINUS, '-')
+            elif self.current_char == '*':
+                self.advance()
+                return Token(MULTIPLY, '*')
+            elif self.current_char == '/':
+                self.advance()
+                return Token(DIVIDE, '/')
             else:
                 self.error()
 
@@ -86,34 +92,38 @@ class Interpreter(object):
         else:
             self.error()
 
+    def term(self):
+        """Return an INTEGER token value."""
+        token = self.current_token
+        self.eat(INTEGER)
+        return token.value
+
     def expr(self):
         """Parsing and interpreting."""
 
         self.current_token = self.get_next_token()
 
-        # An integer, for example, 3
-        left = self.current_token
-        self.eat(INTEGER)
-        # An operator, '+' or '-'
-        op = self.current_token
-        if op.type == PLUS:
-            self.eat(PLUS)
-        elif op.type == MINUS:
-            self.eat(MINUS)
-        else:
-            self.error()
-        # An integer, for example, 5
-        right = self.current_token
-        self.eat(INTEGER)
-        # After the above call, self.current_token is set to the EOF token
+        result = self.term()
+        while self.current_token.type in (PLUS, MINUS, MULTIPLY, DIVIDE):
+            token = self.current_token
 
-        # Once we verify that the input format is correct, compute and print the result
-        if op.type == PLUS:
-            result = left.value + right.value
-        elif op.type == MINUS:
-            result = left.value - right.value
-        else:
-            self.error()
+            if token.type == PLUS:
+                self.eat(PLUS)
+                result = result + self.term()
+            elif token.type == MINUS:
+                self.eat(MINUS)
+                result = result - self.term()
+            elif token.type == MULTIPLY:
+                self.eat(MULTIPLY)
+                result = result * self.term()
+            elif token.type == DIVIDE:
+                self.eat(DIVIDE)
+                try:
+                    result = result / self.term()
+                except ZeroDivisionError:
+                    result = "The divisor must be non-zero."
+            else:
+                self.error()
 
         return result
 
