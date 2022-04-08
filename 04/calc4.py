@@ -1,6 +1,6 @@
 INTEGER, PLUS, MINUS, MUL, DIV, EOF = 'INTEGER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'EOF'
 
-class Token():
+class Token:
     def __init__(self, type, value):
         self.type = type
         self.value = value
@@ -17,7 +17,7 @@ class Token():
     def __repr__(self):
         return self.__str__()
 
-class Lexer():
+class Lexer:
     def __init__(self, text):
         self.text = text
         self.pos = 0
@@ -77,7 +77,7 @@ class Lexer():
 
         return Token(EOF, None)
 
-class Interpreter(object):
+class Interpreter:
     def __init__(self, lexer):
         self.lexer = lexer
         self.current_token = self.lexer.get_next_token()
