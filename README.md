@@ -1,6 +1,6 @@
-# pip
+# pIp
 
-"pip" stands for "Pascal Interpreter in Python". This project is a simple interpreter for a large subset of Pascal language. The underlying language is Python. For example, pip is able to interpret the following Pascal program:
+"pIp" stands for "Pascal Interpreter in Python". This project is a simple interpreter for a large subset of Pascal language. The underlying language is Python. For example, pip is able to interpret the following Pascal program:
 
 ```pascal
 program factorial;
