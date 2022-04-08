@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUX', 'EOF'
 
 class Token():

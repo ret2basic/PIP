@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, EOF = 'INTEGER', 'PLUS', 'MINUS', 'MULTIPLY', 'DIVIDE', 'EOF'
 
 class Token():

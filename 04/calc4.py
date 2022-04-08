@@ -1,10 +1,8 @@
-INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, EOF = 'INTEGER', 'PLUS', 'MINUS', 'MULTIPLY', 'DIVIDE', 'EOF'
+INTEGER, PLUS, MINUS, MUL, DIV, EOF = 'INTEGER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'EOF'
 
 class Token():
     def __init__(self, type, value):
-        # Token types: 'INTEGER', 'PLUS', or 'EOF'
         self.type = type
-        # Token values: 0, 1, 2. 3, 4, 5, 6, 7, 8, 9, '+', or None
         self.value = value
 
     def __str__(self):
@@ -12,54 +10,51 @@ class Token():
 
         Examples:
             Token(INTEGER, 3)
-            Token(PLUS '+')
-            Token(INTEGER, 5)
+            Token(MUL, '*')
         """
         return f"Token({self.type}, {repr(self.value)})"
 
-class Interpreter(object):
+    def __repr__(self):
+        return self.__str__()
+
+class Lexer():
     def __init__(self, text):
-        # The input string, e.g. "3+5"
         self.text = text
-        # The "pointer"
         self.pos = 0
-        # The current token. e.g. '3' or '+' or '5'
-        self.current_token = None
-        # The current character pointed by the "pointer"
         self.current_char = self.text[self.pos]
 
     def error(self):
-        raise Exception('Error parsing input.')
+        raise Exception('Invalid character.')
 
     def advance(self):
         """Advance the `pos` pointer and set the `current_char` variable."""
-
         self.pos += 1
+
         if self.pos > len(self.text) - 1:
-            # Indicates end of input
             self.current_char = None
         else:
             self.current_char = self.text[self.pos]
 
     def skip_whitespace(self):
-        """If the current character is whitespace, advance."""
-
-        while self.current_char is not None and self.current_char.isspace():
+        while self.current_char and self.current_char.isspace():
             self.advance()
 
     def integer(self):
         """Return a (multidigit) integer consumed from the input."""
-
-        result = ""
-        while self.current_char is not None and self.current_char.isdigit():
+        result = ''
+        while self.current_char and self.current_char.isdigit():
             result += self.current_char
             self.advance()
         return int(result)
-    
-    def get_next_token(self):
-        """This is the tokenizer."""
 
-        while self.current_char != None:
+    def get_next_token(self):
+        """Lexical analyzer (also known as scanner or tokenizer)
+
+        This method is responsible for breaking a sentence
+        apart into tokens. One token at a time.
+        """
+        while self.current_char:
+
             if self.current_char.isspace():
                 self.skip_whitespace()
                 continue
@@ -73,69 +68,77 @@ class Interpreter(object):
                 return Token(MINUS, '-')
             elif self.current_char == '*':
                 self.advance()
-                return Token(MULTIPLY, '*')
+                return Token(MUL, '*')
             elif self.current_char == '/':
                 self.advance()
-                return Token(DIVIDE, '/')
+                return Token(DIV, '/')
             else:
                 self.error()
 
-        # If the current character is None, return the EOF token.
         return Token(EOF, None)
 
+class Interpreter(object):
+    def __init__(self, lexer):
+        self.lexer = lexer
+        self.current_token = self.lexer.get_next_token()
+
+    def error(self):
+        raise Exception('Invalid syntax')
+
     def eat(self, token_type):
-        """Verify the current toke type and move to the next token."""
         if self.current_token.type == token_type:
-            self.current_token = self.get_next_token()
+            self.current_token = self.lexer.get_next_token()
         else:
             self.error()
 
-    def term(self):
-        """Return an INTEGER token value."""
+    def factor(self):
+        """Return an INTEGER token value.
+
+        factor : INTEGER
+        """
         token = self.current_token
         self.eat(INTEGER)
         return token.value
 
     def expr(self):
-        """Parsing and interpreting."""
+        """Arithmetic expression parser / interpreter.
 
-        self.current_token = self.get_next_token()
+        expr   : factor ((PLUS | MINUS | MUL | DIV) factor)*
+        factor : INTEGER
+        """
+        result = self.factor()
 
-        result = self.term()
-        while self.current_token.type in (PLUS, MINUS, MULTIPLY, DIVIDE):
+        while self.current_token.type in (PLUS, MUL, MUL, DIV):
             token = self.current_token
-
             if token.type == PLUS:
                 self.eat(PLUS)
-                result = result + self.term()
+                result += self.factor()
             elif token.type == MINUS:
                 self.eat(MINUS)
-                result = result - self.term()
-            elif token.type == MULTIPLY:
-                self.eat(MULTIPLY)
-                result = result * self.term()
-            elif token.type == DIVIDE:
-                self.eat(DIVIDE)
-                try:
-                    result = result / self.term()
-                except ZeroDivisionError:
-                    result = "The divisor must be non-zero."
-            else:
-                self.error()
+                result -= self.factor()
+            elif token.type == MUL:
+                self.eat(MUL)
+                result *= self.factor()
+            elif token.type == DIV:
+                self.eat(DIV)
+                result //= self.factor()
 
         return result
 
-if __name__ == "__main__":
-    # REPL
+def main():
     while True:
-        # Print a prompt and wait for user input
         try:
-            text = input("calc> ")
+            text = input('calc> ')
         except EOFError:
             break
-        # If the user input nothing and pressed enter, print the prompt again and wait
+        if text == 'exit':
+            exit()
         if not text:
             continue
-        interpreter = Interpreter(text)
+        lexer = Lexer(text)
+        interpreter = Interpreter(lexer)
         result = interpreter.expr()
         print(result)
+
+if __name__ == '__main__':
+    main()
