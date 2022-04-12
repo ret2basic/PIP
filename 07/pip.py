@@ -1,4 +1,4 @@
-""" SPI - Simple Pascal Interpreter """
+""" PIP v1 - Pascal Interpreter (in) Python version 1"""
 
 ###############################################################################
 #                                                                             #
@@ -28,10 +28,7 @@ class Token(object):
             Token(PLUS, '+')
             Token(MUL, '*')
         """
-        return 'Token({type}, {value})'.format(
-            type=self.type,
-            value=repr(self.value)
-        )
+        return f"Token({self.type}, {repr(self.value)})"
 
     def __repr__(self):
         return self.__str__()
@@ -39,14 +36,14 @@ class Token(object):
 
 class Lexer(object):
     def __init__(self, text):
-        # client string input, e.g. "4 + 2 * 3 - 6 / 2"
+        # User input, e.g. "4 + 2 * 3 - 6 / 2"
         self.text = text
         # self.pos is an index into self.text
         self.pos = 0
         self.current_char = self.text[self.pos]
 
     def error(self):
-        raise Exception('Invalid character')
+        raise Exception('Invalid character.')
 
     def advance(self):
         """Advance the `pos` pointer and set the `current_char` variable."""
@@ -57,13 +54,13 @@ class Lexer(object):
             self.current_char = self.text[self.pos]
 
     def skip_whitespace(self):
-        while self.current_char is not None and self.current_char.isspace():
+        while self.current_char and self.current_char.isspace():
             self.advance()
 
     def integer(self):
         """Return a (multidigit) integer consumed from the input."""
         result = ''
-        while self.current_char is not None and self.current_char.isdigit():
+        while self.current_char and self.current_char.isdigit():
             result += self.current_char
             self.advance()
         return int(result)
@@ -74,40 +71,33 @@ class Lexer(object):
         This method is responsible for breaking a sentence
         apart into tokens. One token at a time.
         """
-        while self.current_char is not None:
+        while self.current_char:
 
             if self.current_char.isspace():
                 self.skip_whitespace()
                 continue
-
-            if self.current_char.isdigit():
+            elif self.current_char.isdigit():
                 return Token(INTEGER, self.integer())
-
-            if self.current_char == '+':
+            elif self.current_char == '+':
                 self.advance()
                 return Token(PLUS, '+')
-
-            if self.current_char == '-':
+            elif self.current_char == '-':
                 self.advance()
                 return Token(MINUS, '-')
-
-            if self.current_char == '*':
+            elif self.current_char == '*':
                 self.advance()
                 return Token(MUL, '*')
-
-            if self.current_char == '/':
+            elif self.current_char == '/':
                 self.advance()
                 return Token(DIV, '/')
-
-            if self.current_char == '(':
+            elif self.current_char == '(':
                 self.advance()
                 return Token(LPAREN, '(')
-
-            if self.current_char == ')':
+            elif self.current_char == ')':
                 self.advance()
                 return Token(RPAREN, ')')
-
-            self.error()
+            else:
+                self.error()
 
         return Token(EOF, None)
 
@@ -121,31 +111,28 @@ class Lexer(object):
 class AST(object):
     pass
 
-
 class BinOp(AST):
     def __init__(self, left, op, right):
         self.left = left
         self.token = self.op = op
         self.right = right
 
-
 class Num(AST):
     def __init__(self, token):
         self.token = token
         self.value = token.value
 
-
 class Parser(object):
     def __init__(self, lexer):
         self.lexer = lexer
-        # set current token to the first token taken from the input
+        # Set current token to the first token taken from the input
         self.current_token = self.lexer.get_next_token()
 
     def error(self):
-        raise Exception('Invalid syntax')
+        raise Exception("Invalid syntax.")
 
     def eat(self, token_type):
-        # compare the current token type with the passed token
+        # Compare the current token type with the passed token
         # type and if they match then "eat" the current token
         # and assign the next token to the self.current_token,
         # otherwise raise an exception.
@@ -203,7 +190,6 @@ class Parser(object):
     def parse(self):
         return self.expr()
 
-
 ###############################################################################
 #                                                                             #
 #  INTERPRETER                                                                #
@@ -217,8 +203,7 @@ class NodeVisitor(object):
         return visitor(node)
 
     def generic_visit(self, node):
-        raise Exception('No visit_{} method'.format(type(node).__name__))
-
+        raise Exception(f"No visit_{type(node).__name__} method")
 
 class Interpreter(NodeVisitor):
     def __init__(self, parser):
@@ -241,13 +226,14 @@ class Interpreter(NodeVisitor):
         tree = self.parser.parse()
         return self.visit(tree)
 
-
 def main():
     while True:
         try:
-            text = input('spi> ')
+            text = input('pip> ')
         except EOFError:
             break
+        if text == 'exit':
+            exit()
         if not text:
             continue
 
@@ -256,7 +242,6 @@ def main():
         interpreter = Interpreter(parser)
         result = interpreter.interpret()
         print(result)
-
 
 if __name__ == '__main__':
     main()
